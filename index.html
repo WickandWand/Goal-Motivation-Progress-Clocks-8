@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pie Chart Clicker</title>
+    <style>
+        .pie-chart-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        svg {
+            transform: rotate(-90deg); /* Rotate the SVG to start from the top */
+        }
+    </style>
+</head>
+<body>
+    <div id="pieChart" class="pie-chart-container" onclick="updateChart()">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+            <circle cx="100" cy="100" r="100" fill="lightgrey" />
+            <path fill="darkgrey" d="" id="pieSlice"></path>
+        </svg>
+    </div>
+
+    <script>
+        let fillState = 0; // Represents the current fill state of the pie chart (0-8)
+
+        function updateChart() {
+            const path = document.getElementById('pieSlice');
+            fillState = (fillState + 1) % 9;
+            if(fillState === 8) {
+                // When the pie chart is fully filled, draw a full circle
+                path.setAttribute('d', describeArc(100, 100, 100, 0, 359.99));
+            } else {
+                const endAngle = fillState * (360 / 8);
+                path.setAttribute('d', describeArc(100, 100, 100, 0, endAngle));
+            }
+        }
+
+        // Function to describe an SVG arc path
+        function describeArc(x, y, radius, startAngle, endAngle){
+            var start = polarToCartesian(x, y, radius, endAngle);
+            var end = polarToCartesian(x, y, radius, startAngle);
+            var largeArcFlag = endAngle - startAngle <= 180 ? "0" : "1";
+            var d = [
+                "M", x, y,
+                "L", start.x, start.y,
+                "A", radius, radius, 0, largeArcFlag, 0, end.x, end.y,
+                "L", x, y
+            ].join(" ");
+
+            return d;       
+        }
+
+        // Function to convert polar coordinates to Cartesian
+        function polarToCartesian(centerX, centerY, radius, angleInDegrees) {
+            var angleInRadians = (angleInDegrees-90) * Math.PI / 180.0;
+
+            return {
+                x: centerX + (radius * Math.cos(angleInRadians)),
+                y: centerY + (radius * Math.sin(angleInRadians))
+            };
+        }
+    </script>
+</body>
+</html>
